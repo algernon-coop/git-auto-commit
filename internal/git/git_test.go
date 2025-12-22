@@ -20,14 +20,16 @@ func TestGetStagedDiff(t *testing.T) {
 	}
 
 	// Configure git user
-	exec.Command("git", "config", "user.name", "Test User").Dir = tmpDir
-	exec.Command("git", "config", "user.email", "test@example.com").Dir = tmpDir
 	cmd = exec.Command("git", "config", "user.name", "Test User")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("Failed to configure git user.name: %v", err)
+	}
 	cmd = exec.Command("git", "config", "user.email", "test@example.com")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("Failed to configure git user.email: %v", err)
+	}
 
 	// Create and commit a file
 	testFile := filepath.Join(tmpDir, "test.txt")

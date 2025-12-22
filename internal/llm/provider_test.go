@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/algernon-coop/git-auto-commit/internal/config"
@@ -158,5 +159,5 @@ func TestBuildPrompt(t *testing.T) {
 }
 
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || (len(s) > 0 && (s[:len(substr)] == substr || contains(s[1:], substr))))
+	return strings.Contains(s, substr)
 }
