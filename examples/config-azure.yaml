@@ -1,0 +1,6 @@
+# Example configuration for Azure OpenAI
+provider: azure
+azure:
+  endpoint: https://your-resource-name.openai.azure.com
+  api_key: your-azure-api-key
+  deployment: your-deployment-name

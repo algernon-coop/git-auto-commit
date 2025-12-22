@@ -1,0 +1,5 @@
+# Example configuration for Anthropic Claude
+provider: claude
+claude:
+  api_key: sk-ant-your-api-key-here
+  model: claude-3-5-sonnet-20241022  # Options: claude-3-5-sonnet-20241022, claude-3-opus-20240229, etc.
