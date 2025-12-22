@@ -113,10 +113,14 @@ func TestCommit(t *testing.T) {
 	// Configure git user
 	cmd = exec.Command("git", "config", "user.name", "Test User")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("Failed to configure git user.name: %v", err)
+	}
 	cmd = exec.Command("git", "config", "user.email", "test@example.com")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("Failed to configure git user.email: %v", err)
+	}
 
 	// Create and stage a file
 	testFile := filepath.Join(tmpDir, "test.txt")
