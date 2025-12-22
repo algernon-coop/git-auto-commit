@@ -129,7 +129,7 @@ func TestOpenAIProvider_GenerateCommitMessage(t *testing.T) {
 	// For now, we'll test the provider creation
 	provider := NewOpenAIProvider("test-key", "gpt-4")
 	if provider == nil {
-		t.Error("Expected provider, got nil")
+		t.Fatal("Expected provider, got nil")
 	}
 
 	if provider.apiKey != "test-key" {

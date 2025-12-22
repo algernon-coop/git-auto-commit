@@ -11,7 +11,7 @@ import (
 func TestGetStagedDiff(t *testing.T) {
 	// Create a temporary git repository
 	tmpDir := t.TempDir()
-	
+
 	// Initialize git repo
 	cmd := exec.Command("git", "init")
 	cmd.Dir = tmpDir
@@ -79,7 +79,7 @@ func TestGetStagedDiff(t *testing.T) {
 func TestGetStagedDiff_NoChanges(t *testing.T) {
 	// Create a temporary git repository
 	tmpDir := t.TempDir()
-	
+
 	// Initialize git repo
 	cmd := exec.Command("git", "init")
 	cmd.Dir = tmpDir
@@ -102,7 +102,7 @@ func TestGetStagedDiff_NoChanges(t *testing.T) {
 func TestCommit(t *testing.T) {
 	// Create a temporary git repository
 	tmpDir := t.TempDir()
-	
+
 	// Initialize git repo
 	cmd := exec.Command("git", "init")
 	cmd.Dir = tmpDir

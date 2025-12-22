@@ -19,7 +19,7 @@ var configureCmd = &cobra.Command{
 
 func runConfigure(cmd *cobra.Command, args []string) error {
 	reader := bufio.NewReader(os.Stdin)
-	
+
 	cfg := &config.Config{}
 
 	fmt.Println("Git Auto-Commit Configuration")
@@ -32,20 +32,29 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 	fmt.Println("4. GitHub Models")
 	fmt.Print("\nEnter choice (1-4): ")
 
-	choice, _ := reader.ReadString('\n')
+	choice, err := reader.ReadString('\n')
+	if err != nil {
+		return fmt.Errorf("failed to read choice: %w", err)
+	}
 	choice = strings.TrimSpace(choice)
 
 	switch choice {
 	case "1":
 		cfg.Provider = "openai"
 		fmt.Print("Enter OpenAI API Key: ")
-		apiKey, _ := reader.ReadString('\n')
+		apiKey, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read API key: %w", err)
+		}
 		cfg.OpenAI = &config.OpenAIConfig{
 			APIKey: strings.TrimSpace(apiKey),
 			Model:  "gpt-4",
 		}
 		fmt.Print("Enter model (default: gpt-4): ")
-		model, _ := reader.ReadString('\n')
+		model, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read model: %w", err)
+		}
 		model = strings.TrimSpace(model)
 		if model != "" {
 			cfg.OpenAI.Model = model
@@ -54,12 +63,21 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 	case "2":
 		cfg.Provider = "azure"
 		fmt.Print("Enter Azure OpenAI Endpoint: ")
-		endpoint, _ := reader.ReadString('\n')
+		endpoint, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read endpoint: %w", err)
+		}
 		fmt.Print("Enter Azure OpenAI API Key: ")
-		apiKey, _ := reader.ReadString('\n')
+		apiKey, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read API key: %w", err)
+		}
 		fmt.Print("Enter Deployment Name: ")
-		deployment, _ := reader.ReadString('\n')
-		
+		deployment, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read deployment: %w", err)
+		}
+
 		cfg.Azure = &config.AzureOpenAIConfig{
 			Endpoint:   strings.TrimSpace(endpoint),
 			APIKey:     strings.TrimSpace(apiKey),
@@ -69,13 +87,19 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 	case "3":
 		cfg.Provider = "claude"
 		fmt.Print("Enter Anthropic API Key: ")
-		apiKey, _ := reader.ReadString('\n')
+		apiKey, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read API key: %w", err)
+		}
 		cfg.Claude = &config.ClaudeConfig{
 			APIKey: strings.TrimSpace(apiKey),
 			Model:  "claude-3-5-sonnet-20241022",
 		}
 		fmt.Print("Enter model (default: claude-3-5-sonnet-20241022): ")
-		model, _ := reader.ReadString('\n')
+		model, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read model: %w", err)
+		}
 		model = strings.TrimSpace(model)
 		if model != "" {
 			cfg.Claude.Model = model
@@ -84,13 +108,19 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 	case "4":
 		cfg.Provider = "github"
 		fmt.Print("Enter GitHub Token: ")
-		token, _ := reader.ReadString('\n')
+		token, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read token: %w", err)
+		}
 		cfg.GitHub = &config.GitHubConfig{
 			Token: strings.TrimSpace(token),
 			Model: "gpt-4o",
 		}
 		fmt.Print("Enter model (default: gpt-4o): ")
-		model, _ := reader.ReadString('\n')
+		model, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read model: %w", err)
+		}
 		model = strings.TrimSpace(model)
 		if model != "" {
 			cfg.GitHub.Model = model

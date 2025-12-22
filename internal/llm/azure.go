@@ -72,7 +72,7 @@ func (p *AzureOpenAIProvider) GenerateCommitMessage(ctx context.Context, diff st
 	}
 
 	if openAIResp.Error != nil {
-		return "", fmt.Errorf("Azure OpenAI API error: %s", openAIResp.Error.Message)
+		return "", fmt.Errorf("azure OpenAI API error: %s", openAIResp.Error.Message)
 	}
 
 	if len(openAIResp.Choices) == 0 {

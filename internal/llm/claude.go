@@ -24,9 +24,9 @@ func NewClaudeProvider(apiKey, model string) *ClaudeProvider {
 }
 
 type claudeRequest struct {
-	Model     string           `json:"model"`
-	MaxTokens int              `json:"max_tokens"`
-	Messages  []claudeMessage  `json:"messages"`
+	Model     string          `json:"model"`
+	MaxTokens int             `json:"max_tokens"`
+	Messages  []claudeMessage `json:"messages"`
 }
 
 type claudeMessage struct {
@@ -88,7 +88,7 @@ func (p *ClaudeProvider) GenerateCommitMessage(ctx context.Context, diff string)
 	}
 
 	if claudeResp.Error != nil {
-		return "", fmt.Errorf("Claude API error: %s", claudeResp.Error.Message)
+		return "", fmt.Errorf("claude API error: %s", claudeResp.Error.Message)
 	}
 
 	if len(claudeResp.Content) == 0 {

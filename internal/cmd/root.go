@@ -25,7 +25,7 @@ var (
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file path (default: $HOME/.git-auto-commit.yaml)")
 	rootCmd.Flags().BoolVarP(&dryRun, "dry-run", "d", false, "generate commit message without committing")
-	
+
 	rootCmd.AddCommand(configureCmd)
 }
 
