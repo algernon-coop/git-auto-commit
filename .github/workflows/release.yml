@@ -49,13 +49,21 @@ jobs:
 
     - name: Install nfpm
       run: |
-        # Install nfpm for creating .deb packages
-        go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+        # Install nfpm for creating .deb packages (pinned version for reproducibility)
+        go install github.com/goreleaser/nfpm/v2/cmd/nfpm@v2.44.1
 
     - name: Create .deb packages
       run: |
         # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
         VERSION=${GITHUB_REF#refs/tags/v}
+        
+        # Validate version format
+        if [[ -z "$VERSION" ]] || [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
+          echo "Error: Invalid or missing version. Got: '$VERSION'"
+          echo "Expected format: v1.2.3 or v1.2.3-suffix"
+          exit 1
+        fi
+        echo "Building packages for version: $VERSION"
         
         # Function to create nfpm config
         create_nfpm_config() {
