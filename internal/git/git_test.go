@@ -153,3 +153,146 @@ func TestCommit(t *testing.T) {
 		t.Errorf("Commit message not found in log: %s", string(output))
 	}
 }
+
+func TestGetCommitGuidelines_WithContributing(t *testing.T) {
+	// Create a temporary directory
+	tmpDir := t.TempDir()
+
+	// Create a CONTRIBUTING.md file with commit guidelines
+	contributingContent := `# Contributing Guide
+
+## Commit Message Format
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+` + "```" + `
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+` + "```" + `
+
+Types:
+- feat: A new feature
+- fix: A bug fix
+- docs: Documentation changes
+
+Examples:
+` + "```" + `
+feat(llm): add support for GPT-4 Turbo
+fix(config): handle missing config file gracefully
+` + "```" + `
+
+## Other Guidelines
+
+Some other unrelated content here.
+`
+	contributingPath := filepath.Join(tmpDir, "CONTRIBUTING.md")
+	if err := os.WriteFile(contributingPath, []byte(contributingContent), 0644); err != nil {
+		t.Fatalf("Failed to create CONTRIBUTING.md: %v", err)
+	}
+
+	// Test GetCommitGuidelines
+	repo := NewRepository(tmpDir)
+	guidelines := repo.GetCommitGuidelines()
+
+	if guidelines == "" {
+		t.Error("Expected non-empty guidelines")
+	}
+
+	if !strings.Contains(guidelines, "Conventional Commits") {
+		t.Error("Guidelines should contain 'Conventional Commits'")
+	}
+
+	if !strings.Contains(guidelines, "feat:") {
+		t.Error("Guidelines should contain commit types like 'feat:'")
+	}
+}
+
+func TestGetCommitGuidelines_WithGitmessage(t *testing.T) {
+	// Create a temporary directory
+	tmpDir := t.TempDir()
+
+	// Create a .gitmessage template file
+	gitmessageContent := `# Title: Summary, imperative, start upper case, don't end with a period
+# No more than 50 chars. #### 50 chars is here:  #
+
+# Remember blank line between title and body.
+
+# Body: Explain *what* and *why* (not *how*). Include task ID (Jira issue).
+# Wrap at 72 chars. ################################## which is here:  #
+
+# At the end: Include Co-authored-by for all contributors.
+# Include at least one empty line before it. Format:
+# Co-authored-by: name <user@users.noreply.github.com>
+`
+	gitmessagePath := filepath.Join(tmpDir, ".gitmessage")
+	if err := os.WriteFile(gitmessagePath, []byte(gitmessageContent), 0644); err != nil {
+		t.Fatalf("Failed to create .gitmessage: %v", err)
+	}
+
+	// Test GetCommitGuidelines
+	repo := NewRepository(tmpDir)
+	guidelines := repo.GetCommitGuidelines()
+
+	if guidelines == "" {
+		t.Error("Expected non-empty guidelines")
+	}
+
+	if !strings.Contains(guidelines, "50 chars") {
+		t.Error("Guidelines should contain template content")
+	}
+}
+
+func TestGetCommitGuidelines_NoGuidelines(t *testing.T) {
+	// Create a temporary directory with no guidelines
+	tmpDir := t.TempDir()
+
+	// Test GetCommitGuidelines
+	repo := NewRepository(tmpDir)
+	guidelines := repo.GetCommitGuidelines()
+
+	if guidelines != "" {
+		t.Errorf("Expected empty guidelines, got: %s", guidelines)
+	}
+}
+
+func TestExtractCommitSection(t *testing.T) {
+	content := `# Contributing Guide
+
+## Getting Started
+
+Some content here.
+
+## Commit Message Format
+
+We use conventional commits.
+
+Types:
+- feat: new feature
+- fix: bug fix
+
+## Code Style
+
+Other content.
+`
+
+	result := extractCommitSection(content)
+
+	if result == "" {
+		t.Error("Expected non-empty result")
+	}
+
+	if !strings.Contains(result, "Commit Message Format") {
+		t.Error("Result should contain the commit section header")
+	}
+
+	if !strings.Contains(result, "conventional commits") {
+		t.Error("Result should contain commit section content")
+	}
+
+	if strings.Contains(result, "Code Style") {
+		t.Error("Result should not contain the next section")
+	}
+}
