@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+
+    - name: Run tests
+      run: go test -v ./...
+
+    - name: Build binaries
+      run: |
+        # Linux AMD64
+        GOOS=linux GOARCH=amd64 go build -o dist/git-auto-commit-linux-amd64 .
+        
+        # Linux ARM64
+        GOOS=linux GOARCH=arm64 go build -o dist/git-auto-commit-linux-arm64 .
+        
+        # Windows AMD64
+        GOOS=windows GOARCH=amd64 go build -o dist/git-auto-commit-windows-amd64.exe .
+        
+        # Windows ARM64
+        GOOS=windows GOARCH=arm64 go build -o dist/git-auto-commit-windows-arm64.exe .
+        
+        # macOS AMD64
+        GOOS=darwin GOARCH=amd64 go build -o dist/git-auto-commit-darwin-amd64 .
+        
+        # macOS ARM64 (Apple Silicon)
+        GOOS=darwin GOARCH=arm64 go build -o dist/git-auto-commit-darwin-arm64 .
+
+    - name: Create checksums
+      run: |
+        cd dist
+        sha256sum * > checksums.txt
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          dist/git-auto-commit-linux-amd64
+          dist/git-auto-commit-linux-arm64
+          dist/git-auto-commit-windows-amd64.exe
+          dist/git-auto-commit-windows-arm64.exe
+          dist/git-auto-commit-darwin-amd64
+          dist/git-auto-commit-darwin-arm64
+          dist/checksums.txt
+        draft: false
+        prerelease: false
+        generate_release_notes: true

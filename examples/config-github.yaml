@@ -1,0 +1,5 @@
+# Example configuration for GitHub Models
+provider: github
+github:
+  token: ghp_your-github-token-here
+  model: gpt-4o  # Options depend on available GitHub models
