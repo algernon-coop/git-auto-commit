@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -126,6 +127,11 @@ func TestSaveAllProviders(t *testing.T) {
 }
 
 func TestConfigFilePermissions(t *testing.T) {
+	// Skip on Windows as file permissions work differently
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping file permission test on Windows")
+	}
+
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "test-config.yaml")
 
