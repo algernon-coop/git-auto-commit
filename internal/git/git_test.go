@@ -258,6 +258,127 @@ func TestGetCommitGuidelines_NoGuidelines(t *testing.T) {
 	}
 }
 
+func TestGetCommitGuidelines_WithCopilotInstructions(t *testing.T) {
+	testCases := []struct {
+		name     string
+		filepath string
+	}{
+		{
+			name:     "GitHub directory",
+			filepath: ".github/copilot-instructions.md",
+		},
+		{
+			name:     "Root directory",
+			filepath: "copilot-instructions.md",
+		},
+		{
+			name:     "Hidden file",
+			filepath: ".copilot-instructions.md",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tmpDir := t.TempDir()
+
+			// Create Copilot instructions file
+			copilotContent := `# Copilot Instructions
+
+## Commit Message Format
+
+Always use conventional commits with the following types:
+- feat: New features
+- fix: Bug fixes
+- docs: Documentation updates
+
+Keep messages concise and descriptive.
+`
+			copilotPath := filepath.Join(tmpDir, tc.filepath)
+			// Create directory if needed
+			if dir := filepath.Dir(copilotPath); dir != tmpDir {
+				if err := os.MkdirAll(dir, 0755); err != nil {
+					t.Fatalf("Failed to create directory: %v", err)
+				}
+			}
+			if err := os.WriteFile(copilotPath, []byte(copilotContent), 0644); err != nil {
+				t.Fatalf("Failed to create copilot instructions: %v", err)
+			}
+
+			// Test GetCommitGuidelines
+			repo := NewRepository(tmpDir)
+			guidelines := repo.GetCommitGuidelines()
+
+			if guidelines == "" {
+				t.Error("Expected non-empty guidelines")
+			}
+
+			if !strings.Contains(guidelines, "Copilot Instructions") {
+				t.Error("Guidelines should contain 'Copilot Instructions'")
+			}
+
+			if !strings.Contains(guidelines, "conventional commits") {
+				t.Error("Guidelines should contain 'conventional commits'")
+			}
+		})
+	}
+}
+
+func TestGetCommitGuidelines_WithMultipleSources(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create CONTRIBUTING.md
+	contributingContent := `# Contributing
+
+## Commit Message Format
+
+Use conventional commits.
+`
+	contributingPath := filepath.Join(tmpDir, "CONTRIBUTING.md")
+	if err := os.WriteFile(contributingPath, []byte(contributingContent), 0644); err != nil {
+		t.Fatalf("Failed to create CONTRIBUTING.md: %v", err)
+	}
+
+	// Create Copilot instructions
+	copilotContent := `# Copilot Instructions
+
+## Commit Format
+
+Keep commits under 50 characters.
+`
+	githubDir := filepath.Join(tmpDir, ".github")
+	if err := os.MkdirAll(githubDir, 0755); err != nil {
+		t.Fatalf("Failed to create .github directory: %v", err)
+	}
+	copilotPath := filepath.Join(githubDir, "copilot-instructions.md")
+	if err := os.WriteFile(copilotPath, []byte(copilotContent), 0644); err != nil {
+		t.Fatalf("Failed to create copilot instructions: %v", err)
+	}
+
+	// Create .gitmessage
+	gitmessageContent := `# Template for commits`
+	gitmessagePath := filepath.Join(tmpDir, ".gitmessage")
+	if err := os.WriteFile(gitmessagePath, []byte(gitmessageContent), 0644); err != nil {
+		t.Fatalf("Failed to create .gitmessage: %v", err)
+	}
+
+	// Test GetCommitGuidelines
+	repo := NewRepository(tmpDir)
+	guidelines := repo.GetCommitGuidelines()
+
+	// Should contain all three sources
+	if !strings.Contains(guidelines, "Repository Contributing Guidelines") {
+		t.Error("Guidelines should contain contributing guidelines")
+	}
+
+	if !strings.Contains(guidelines, "Copilot Instructions") {
+		t.Error("Guidelines should contain copilot instructions")
+	}
+
+	if !strings.Contains(guidelines, "Repository Commit Template") {
+		t.Error("Guidelines should contain commit template")
+	}
+}
+
 func TestExtractCommitSection(t *testing.T) {
 	content := `# Contributing Guide
 

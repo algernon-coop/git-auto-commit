@@ -51,7 +51,7 @@ func (r *Repository) Commit(message string) error {
 }
 
 // GetCommitGuidelines returns commit message guidelines from the repository
-// It checks for CONTRIBUTING.md and .gitmessage files
+// It checks for CONTRIBUTING.md, .gitmessage, and Copilot instructions files
 func (r *Repository) GetCommitGuidelines() string {
 	var guidelines strings.Builder
 
@@ -64,6 +64,25 @@ func (r *Repository) GetCommitGuidelines() string {
 			guidelines.WriteString("Repository Contributing Guidelines:\n")
 			guidelines.WriteString(extracted)
 			guidelines.WriteString("\n\n")
+		}
+	}
+
+	// Check for Copilot instructions in common locations
+	copilotPaths := []string{
+		filepath.Join(r.path, ".github", "copilot-instructions.md"),
+		filepath.Join(r.path, "copilot-instructions.md"),
+		filepath.Join(r.path, ".copilot-instructions.md"),
+	}
+	for _, copilotPath := range copilotPaths {
+		if content, err := os.ReadFile(copilotPath); err == nil {
+			copilotContent := string(content)
+			// Extract commit message related sections
+			if extracted := extractCommitSection(copilotContent); extracted != "" {
+				guidelines.WriteString("Copilot Instructions:\n")
+				guidelines.WriteString(extracted)
+				guidelines.WriteString("\n\n")
+			}
+			break // Only read the first found Copilot instructions file
 		}
 	}
 
