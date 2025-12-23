@@ -17,6 +17,18 @@ A cross-platform CLI tool that automatically generates meaningful commit message
 
 ## Installation
 
+### Windows (MSI Installer)
+
+Download and run the MSI installer from the [releases page](https://github.com/algernon-coop/git-auto-commit/releases):
+
+- `git-auto-commit-windows-amd64.msi` for 64-bit Intel/AMD processors
+- `git-auto-commit-windows-arm64.msi` for ARM64 processors
+
+The MSI installer will:
+- Install the binary to `C:\Program Files\Git Auto Commit\`
+- Automatically add the installation directory to your system PATH
+- Allow easy uninstallation via Windows Settings
+
 ### From Source
 
 ```bash
@@ -33,7 +45,7 @@ go build -o git-auto-commit .
 
 ### Pre-built Binaries
 
-Download pre-built binaries from the [releases page](https://github.com/algernon-coop/git-auto-commit/releases).
+Download pre-built binaries or MSI installers for Windows from the [releases page](https://github.com/algernon-coop/git-auto-commit/releases).
 
 ## Quick Start
 
