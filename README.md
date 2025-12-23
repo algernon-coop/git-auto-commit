@@ -25,7 +25,7 @@ Download and run the MSI installer from the [releases page](https://github.com/a
 - `git-auto-commit-windows-arm64.msi` for ARM64 processors
 
 The MSI installer will:
-- Install the binary to `C:\Program Files\Algernon Coop\Git Auto Commit\`
+- Install the binary to `C:\Program Files\Git Auto Commit\`
 - Automatically add the installation directory to your system PATH
 - Allow easy uninstallation via Windows Settings
 

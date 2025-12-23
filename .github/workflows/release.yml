@@ -47,19 +47,71 @@ jobs:
         # macOS ARM64 (Apple Silicon)
         GOOS=darwin GOARCH=arm64 go build -o dist/git-auto-commit-darwin-arm64 .
 
-    - name: Install WiX Toolset
+    - name: Upload Windows binaries for MSI build
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-binaries
+        path: dist/*.exe
+
+    - name: Upload other binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: other-binaries
+        path: |
+          dist/git-auto-commit-linux-*
+          dist/git-auto-commit-darwin-*
+
+  build-msi:
+    name: Build MSI Installers
+    runs-on: windows-latest
+    needs: release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download Windows binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-binaries
+        path: dist
+
+    - name: Install go-msi
       run: |
-        dotnet tool install --global wix --version 5.0.2
-        wix --version
+        go install github.com/mh-cbon/go-msi@latest
+        echo "$env:USERPROFILE\go\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Build MSI for Windows AMD64
       run: |
-        chmod +x build/windows/build-msi.sh
-        ./build/windows/build-msi.sh amd64 ${{ github.ref_name }} dist/git-auto-commit-windows-amd64.exe
+        .\build\windows\build-msi.ps1 -Arch amd64 -Version ${{ github.ref_name }} -BinaryPath dist\git-auto-commit-windows-amd64.exe
 
     - name: Build MSI for Windows ARM64
       run: |
-        ./build/windows/build-msi.sh arm64 ${{ github.ref_name }} dist/git-auto-commit-windows-arm64.exe
+        .\build\windows\build-msi.ps1 -Arch arm64 -Version ${{ github.ref_name }} -BinaryPath dist\git-auto-commit-windows-arm64.exe
+
+    - name: Upload MSI files
+      uses: actions/upload-artifact@v4
+      with:
+        name: msi-files
+        path: dist/*.msi
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [release, build-msi]
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Consolidate artifacts
+      run: |
+        mkdir -p dist
+        cp artifacts/windows-binaries/* dist/ || true
+        cp artifacts/other-binaries/* dist/ || true
+        cp artifacts/msi-files/* dist/ || true
 
     - name: Create checksums
       run: |
