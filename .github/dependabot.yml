@@ -11,9 +11,6 @@ updates:
     labels:
       - "dependencies"
       - "go"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -26,6 +23,3 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
