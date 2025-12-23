@@ -47,6 +47,20 @@ jobs:
         # macOS ARM64 (Apple Silicon)
         GOOS=darwin GOARCH=arm64 go build -o dist/git-auto-commit-darwin-arm64 .
 
+    - name: Install WiX Toolset
+      run: |
+        dotnet tool install --global wix --version 5.0.2
+        wix --version
+
+    - name: Build MSI for Windows AMD64
+      run: |
+        chmod +x build/windows/build-msi.sh
+        ./build/windows/build-msi.sh amd64 ${{ github.ref_name }} dist/git-auto-commit-windows-amd64.exe
+
+    - name: Build MSI for Windows ARM64
+      run: |
+        ./build/windows/build-msi.sh arm64 ${{ github.ref_name }} dist/git-auto-commit-windows-arm64.exe
+
     - name: Create checksums
       run: |
         cd dist
@@ -60,6 +74,8 @@ jobs:
           dist/git-auto-commit-linux-arm64
           dist/git-auto-commit-windows-amd64.exe
           dist/git-auto-commit-windows-arm64.exe
+          dist/git-auto-commit-windows-amd64.msi
+          dist/git-auto-commit-windows-arm64.msi
           dist/git-auto-commit-darwin-amd64
           dist/git-auto-commit-darwin-arm64
           dist/checksums.txt
