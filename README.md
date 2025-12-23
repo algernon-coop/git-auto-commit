@@ -19,7 +19,9 @@ A cross-platform CLI tool that automatically generates meaningful commit message
 
 ### Debian/Ubuntu (.deb package)
 
-Download and install the appropriate `.deb` package for your architecture from the [releases page](https://github.com/algernon-coop/git-auto-commit/releases):
+Download and install the appropriate `.deb` package for your architecture from the [releases page](https://github.com/algernon-coop/git-auto-commit/releases).
+
+**Option 1: Download a specific version**
 
 ```bash
 # For AMD64 (x86_64) - replace 1.0.0 with the desired version
@@ -31,19 +33,17 @@ wget https://github.com/algernon-coop/git-auto-commit/releases/download/v1.0.0/g
 sudo dpkg -i git-auto-commit_1.0.0_arm64.deb
 ```
 
-Or use `latest` to get the most recent release:
+**Option 2: Download the latest version automatically using GitHub CLI**
 
 ```bash
 # For AMD64 (x86_64)
-wget https://github.com/algernon-coop/git-auto-commit/releases/latest/download/git-auto-commit_VERSION_amd64.deb
-sudo dpkg -i git-auto-commit_VERSION_amd64.deb
+gh release download --repo algernon-coop/git-auto-commit --pattern '*_amd64.deb'
+sudo dpkg -i git-auto-commit_*_amd64.deb
 
 # For ARM64
-wget https://github.com/algernon-coop/git-auto-commit/releases/latest/download/git-auto-commit_VERSION_arm64.deb
-sudo dpkg -i git-auto-commit_VERSION_arm64.deb
+gh release download --repo algernon-coop/git-auto-commit --pattern '*_arm64.deb'
+sudo dpkg -i git-auto-commit_*_arm64.deb
 ```
-
-Note: When using `latest`, you'll need to know the version number to use in the `dpkg -i` command, or use a wildcard like `git-auto-commit_*_amd64.deb`.
 
 ### From Source
 
