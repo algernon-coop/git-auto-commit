@@ -47,6 +47,65 @@ jobs:
         # macOS ARM64 (Apple Silicon)
         GOOS=darwin GOARCH=arm64 go build -o dist/git-auto-commit-darwin-arm64 .
 
+    - name: Install nfpm
+      run: |
+        # Install nfpm for creating .deb packages (pinned version for reproducibility)
+        go install github.com/goreleaser/nfpm/v2/cmd/nfpm@v2.44.1
+
+    - name: Create .deb packages
+      run: |
+        # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
+        VERSION=${GITHUB_REF#refs/tags/v}
+        
+        # Validate version format (semantic versioning with optional pre-release/build metadata)
+        if [[ -z "$VERSION" ]] || [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$ ]]; then
+          echo "Error: Invalid or missing version. Got: '$VERSION'"
+          echo "Expected format: 1.2.3, 1.2.3-beta, 1.2.3-rc.1, 1.2.3+build123, etc."
+          exit 1
+        fi
+        echo "Building packages for version: $VERSION"
+        
+        # Function to create nfpm config
+        create_nfpm_config() {
+          local arch=$1
+          local binary_name=$2
+          cat > nfpm-${arch}.yaml << NFPM_EOF
+        name: git-auto-commit
+        arch: ${arch}
+        platform: linux
+        version: ${VERSION}
+        section: utils
+        priority: optional
+        maintainer: Algernon Coop <https://github.com/algernon-coop>
+        description: |
+          A cross-platform CLI tool that automatically generates meaningful commit
+          messages from your staged changes using AI.
+          .
+          Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
+          GitHub Models), generates conventional commit format messages, and provides
+          a simple interactive configuration wizard.
+        vendor: Algernon Coop
+        homepage: https://github.com/algernon-coop/git-auto-commit
+        license: MIT
+        contents:
+          - src: ./dist/${binary_name}
+            dst: /usr/bin/git-auto-commit
+            file_info:
+              mode: 0755
+        NFPM_EOF
+        }
+        
+        # Create and build AMD64 package
+        create_nfpm_config "amd64" "git-auto-commit-linux-amd64"
+        nfpm package --config nfpm-amd64.yaml --packager deb --target dist/git-auto-commit_${VERSION}_amd64.deb
+        
+        # Create and build ARM64 package
+        create_nfpm_config "arm64" "git-auto-commit-linux-arm64"
+        nfpm package --config nfpm-arm64.yaml --packager deb --target dist/git-auto-commit_${VERSION}_arm64.deb
+        
+        # Clean up temporary config files
+        rm -f nfpm-*.yaml
+
     - name: Create checksums
       run: |
         cd dist
@@ -62,6 +121,7 @@ jobs:
           dist/git-auto-commit-windows-arm64.exe
           dist/git-auto-commit-darwin-amd64
           dist/git-auto-commit-darwin-arm64
+          dist/*.deb
           dist/checksums.txt
         draft: false
         prerelease: false
