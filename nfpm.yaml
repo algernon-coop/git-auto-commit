@@ -1,0 +1,18 @@
+name: git-auto-commit
+arch: ${ARCH}
+platform: linux
+version: ${VERSION}
+section: utils
+priority: optional
+maintainer: Algernon Coop <https://github.com/algernon-coop>
+description: |
+  A cross-platform CLI tool that automatically generates meaningful commit
+  messages from your staged changes using AI.
+  .
+  Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
+  GitHub Models), generates conventional commit format messages, and provides
+  a simple interactive configuration wizard.
+vendor: Algernon Coop
+homepage: https://github.com/algernon-coop/git-auto-commit
+license: MIT
+

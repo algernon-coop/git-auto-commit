@@ -17,6 +17,22 @@ A cross-platform CLI tool that automatically generates meaningful commit message
 
 ## Installation
 
+### Debian/Ubuntu (.deb package)
+
+Download and install the appropriate `.deb` package for your architecture from the [releases page](https://github.com/algernon-coop/git-auto-commit/releases):
+
+```bash
+# For AMD64 (x86_64)
+wget https://github.com/algernon-coop/git-auto-commit/releases/latest/download/git-auto-commit_VERSION_amd64.deb
+sudo dpkg -i git-auto-commit_VERSION_amd64.deb
+
+# For ARM64
+wget https://github.com/algernon-coop/git-auto-commit/releases/latest/download/git-auto-commit_VERSION_arm64.deb
+sudo dpkg -i git-auto-commit_VERSION_arm64.deb
+```
+
+Replace `VERSION` with the actual version number (e.g., `1.0.0`).
+
 ### From Source
 
 ```bash

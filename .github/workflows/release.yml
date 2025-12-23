@@ -47,6 +47,71 @@ jobs:
         # macOS ARM64 (Apple Silicon)
         GOOS=darwin GOARCH=arm64 go build -o dist/git-auto-commit-darwin-arm64 .
 
+    - name: Install nfpm
+      run: |
+        # Install nfpm for creating .deb packages
+        go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+
+    - name: Create .deb packages
+      run: |
+        # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
+        VERSION=${GITHUB_REF#refs/tags/v}
+        
+        # Create .deb for AMD64
+        cat > nfpm-amd64.yaml << EOF
+        name: git-auto-commit
+        arch: amd64
+        platform: linux
+        version: ${VERSION}
+        section: utils
+        priority: optional
+        maintainer: Algernon Coop <https://github.com/algernon-coop>
+        description: |
+          A cross-platform CLI tool that automatically generates meaningful commit
+          messages from your staged changes using AI.
+          .
+          Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
+          GitHub Models), generates conventional commit format messages, and provides
+          a simple interactive configuration wizard.
+        vendor: Algernon Coop
+        homepage: https://github.com/algernon-coop/git-auto-commit
+        license: MIT
+        contents:
+          - src: ./dist/git-auto-commit-linux-amd64
+            dst: /usr/bin/git-auto-commit
+            file_info:
+              mode: 0755
+        EOF
+        nfpm package --config nfpm-amd64.yaml --packager deb --target dist/git-auto-commit_${VERSION}_amd64.deb
+        
+        # Create .deb for ARM64
+        cat > nfpm-arm64.yaml << EOF
+        name: git-auto-commit
+        arch: arm64
+        platform: linux
+        version: ${VERSION}
+        section: utils
+        priority: optional
+        maintainer: Algernon Coop <https://github.com/algernon-coop>
+        description: |
+          A cross-platform CLI tool that automatically generates meaningful commit
+          messages from your staged changes using AI.
+          .
+          Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
+          GitHub Models), generates conventional commit format messages, and provides
+          a simple interactive configuration wizard.
+        vendor: Algernon Coop
+        homepage: https://github.com/algernon-coop/git-auto-commit
+        license: MIT
+        contents:
+          - src: ./dist/git-auto-commit-linux-arm64
+            dst: /usr/bin/git-auto-commit
+            file_info:
+              mode: 0755
+        EOF
+        nfpm package --config nfpm-arm64.yaml --packager deb --target dist/git-auto-commit_${VERSION}_arm64.deb
+
+
     - name: Create checksums
       run: |
         cd dist
@@ -62,6 +127,7 @@ jobs:
           dist/git-auto-commit-windows-arm64.exe
           dist/git-auto-commit-darwin-amd64
           dist/git-auto-commit-darwin-arm64
+          dist/*.deb
           dist/checksums.txt
         draft: false
         prerelease: false
