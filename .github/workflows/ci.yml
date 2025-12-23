@@ -92,7 +92,7 @@ jobs:
       run: go build -v -o git-auto-commit${{ matrix.os == 'windows-latest' && '.exe' || '' }} .
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: git-auto-commit-${{ matrix.os }}
         path: git-auto-commit${{ matrix.os == 'windows-latest' && '.exe' || '' }}
