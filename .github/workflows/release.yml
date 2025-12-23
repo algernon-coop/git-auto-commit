@@ -57,25 +57,21 @@ jobs:
         # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
         VERSION=${GITHUB_REF#refs/tags/v}
         
-        # Shared package metadata
-        DESCRIPTION="A cross-platform CLI tool that automatically generates meaningful commit
-          messages from your staged changes using AI.
-          .
-          Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
-          GitHub Models), generates conventional commit format messages, and provides
-          a simple interactive configuration wizard."
-        
         # Create .deb for AMD64
-        cat > nfpm-amd64.yaml << EOF
+        cat > nfpm-amd64.yaml << 'EOF'
         name: git-auto-commit
         arch: amd64
         platform: linux
-        version: ${VERSION}
         section: utils
         priority: optional
         maintainer: Algernon Coop <https://github.com/algernon-coop>
         description: |
-          ${DESCRIPTION}
+          A cross-platform CLI tool that automatically generates meaningful commit
+          messages from your staged changes using AI.
+          .
+          Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
+          GitHub Models), generates conventional commit format messages, and provides
+          a simple interactive configuration wizard.
         vendor: Algernon Coop
         homepage: https://github.com/algernon-coop/git-auto-commit
         license: MIT
@@ -85,19 +81,25 @@ jobs:
             file_info:
               mode: 0755
         EOF
+        # Add version to config (can't use variable in quoted heredoc above)
+        sed -i "s/platform: linux/platform: linux\nversion: ${VERSION}/" nfpm-amd64.yaml
         nfpm package --config nfpm-amd64.yaml --packager deb --target dist/git-auto-commit_${VERSION}_amd64.deb
         
         # Create .deb for ARM64
-        cat > nfpm-arm64.yaml << EOF
+        cat > nfpm-arm64.yaml << 'EOF'
         name: git-auto-commit
         arch: arm64
         platform: linux
-        version: ${VERSION}
         section: utils
         priority: optional
         maintainer: Algernon Coop <https://github.com/algernon-coop>
         description: |
-          ${DESCRIPTION}
+          A cross-platform CLI tool that automatically generates meaningful commit
+          messages from your staged changes using AI.
+          .
+          Features multiple AI providers (OpenAI, Azure OpenAI, Anthropic Claude,
+          GitHub Models), generates conventional commit format messages, and provides
+          a simple interactive configuration wizard.
         vendor: Algernon Coop
         homepage: https://github.com/algernon-coop/git-auto-commit
         license: MIT
@@ -107,7 +109,10 @@ jobs:
             file_info:
               mode: 0755
         EOF
+        # Add version to config (can't use variable in quoted heredoc above)
+        sed -i "s/platform: linux/platform: linux\nversion: ${VERSION}/" nfpm-arm64.yaml
         nfpm package --config nfpm-arm64.yaml --packager deb --target dist/git-auto-commit_${VERSION}_arm64.deb
+
 
     - name: Create checksums
       run: |
