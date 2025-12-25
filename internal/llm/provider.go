@@ -9,7 +9,7 @@ import (
 
 // Provider is the interface for AI providers
 type Provider interface {
-	GenerateCommitMessage(ctx context.Context, diff string) (string, error)
+	GenerateCommitMessage(ctx context.Context, diff string, guidelines string) (string, error)
 }
 
 // NewProvider creates a new provider based on the configuration
@@ -42,16 +42,22 @@ func NewProvider(cfg *config.Config) (Provider, error) {
 
 // buildPrompt creates a prompt for generating commit messages
 func buildPrompt(diff string) string {
-	return fmt.Sprintf(`You are a helpful assistant that generates clear, concise git commit messages following conventional commit format.
+	return buildPromptWithGuidelines(diff, "")
+}
+
+// buildPromptWithGuidelines creates a prompt for generating commit messages with optional repository guidelines
+func buildPromptWithGuidelines(diff string, guidelines string) string {
+	basePrompt := `You are a helpful assistant that generates clear, concise git commit messages following conventional commit format.
 
 Based on the following git diff, generate a commit message that:
 1. Uses conventional commit format (e.g., "feat:", "fix:", "docs:", "refactor:", etc.)
 2. Has a clear, concise subject line (max 50 characters)
 3. Optionally includes a body with more details if the change is complex
-4. Focuses on WHAT changed and WHY, not HOW
+4. Focuses on WHAT changed and WHY, not HOW`
 
-Git diff:
-%s
+	if guidelines != "" {
+		basePrompt += fmt.Sprintf("\n\nIMPORTANT: Follow these repository-specific commit message guidelines:\n%s", guidelines)
+	}
 
-Generate only the commit message, without any additional explanation or formatting markers.`, diff)
+	return fmt.Sprintf("%s\n\nGit diff:\n%s\n\nGenerate only the commit message, without any additional explanation or formatting markers.", basePrompt, diff)
 }

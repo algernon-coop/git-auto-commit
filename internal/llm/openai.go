@@ -43,13 +43,13 @@ type openAIResponse struct {
 }
 
 // GenerateCommitMessage generates a commit message using OpenAI
-func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string) (string, error) {
+func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string, guidelines string) (string, error) {
 	req := openAIRequest{
 		Model: p.model,
 		Messages: []openAIMessage{
 			{
 				Role:    "user",
-				Content: buildPrompt(diff),
+				Content: buildPromptWithGuidelines(diff, guidelines),
 			},
 		},
 	}

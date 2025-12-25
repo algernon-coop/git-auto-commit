@@ -158,6 +158,45 @@ func TestBuildPrompt(t *testing.T) {
 	}
 }
 
+func TestBuildPromptWithGuidelines(t *testing.T) {
+	diff := "diff --git a/test.txt b/test.txt\n+new line"
+	guidelines := "Use type(scope): subject format\nTypes: feat, fix, docs"
+
+	prompt := buildPromptWithGuidelines(diff, guidelines)
+
+	if prompt == "" {
+		t.Error("Expected non-empty prompt")
+	}
+
+	if !contains(prompt, "conventional commit") {
+		t.Error("Prompt should mention conventional commit format")
+	}
+
+	if !contains(prompt, diff) {
+		t.Error("Prompt should contain the diff")
+	}
+
+	if !contains(prompt, guidelines) {
+		t.Error("Prompt should contain the guidelines")
+	}
+
+	if !contains(prompt, "repository-specific") {
+		t.Error("Prompt should mention repository-specific guidelines")
+	}
+}
+
+func TestBuildPromptWithGuidelines_EmptyGuidelines(t *testing.T) {
+	diff := "diff --git a/test.txt b/test.txt\n+new line"
+
+	promptWithEmpty := buildPromptWithGuidelines(diff, "")
+	promptWithoutGuidelines := buildPrompt(diff)
+
+	// Both should be the same when guidelines are empty
+	if promptWithEmpty != promptWithoutGuidelines {
+		t.Error("Prompt with empty guidelines should match prompt without guidelines")
+	}
+}
+
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }

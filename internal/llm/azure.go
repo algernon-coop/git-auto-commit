@@ -27,12 +27,12 @@ func NewAzureOpenAIProvider(endpoint, apiKey, deployment string) *AzureOpenAIPro
 }
 
 // GenerateCommitMessage generates a commit message using Azure OpenAI
-func (p *AzureOpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string) (string, error) {
+func (p *AzureOpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string, guidelines string) (string, error) {
 	req := openAIRequest{
 		Messages: []openAIMessage{
 			{
 				Role:    "user",
-				Content: buildPrompt(diff),
+				Content: buildPromptWithGuidelines(diff, guidelines),
 			},
 		},
 	}

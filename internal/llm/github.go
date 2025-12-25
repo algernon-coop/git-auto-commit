@@ -24,13 +24,13 @@ func NewGitHubProvider(token, model string) *GitHubProvider {
 }
 
 // GenerateCommitMessage generates a commit message using GitHub Models
-func (p *GitHubProvider) GenerateCommitMessage(ctx context.Context, diff string) (string, error) {
+func (p *GitHubProvider) GenerateCommitMessage(ctx context.Context, diff string, guidelines string) (string, error) {
 	req := openAIRequest{
 		Model: p.model,
 		Messages: []openAIMessage{
 			{
 				Role:    "user",
-				Content: buildPrompt(diff),
+				Content: buildPromptWithGuidelines(diff, guidelines),
 			},
 		},
 	}

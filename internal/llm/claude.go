@@ -44,14 +44,14 @@ type claudeResponse struct {
 }
 
 // GenerateCommitMessage generates a commit message using Claude
-func (p *ClaudeProvider) GenerateCommitMessage(ctx context.Context, diff string) (string, error) {
+func (p *ClaudeProvider) GenerateCommitMessage(ctx context.Context, diff string, guidelines string) (string, error) {
 	req := claudeRequest{
 		Model:     p.model,
 		MaxTokens: 1024,
 		Messages: []claudeMessage{
 			{
 				Role:    "user",
-				Content: buildPrompt(diff),
+				Content: buildPromptWithGuidelines(diff, guidelines),
 			},
 		},
 	}

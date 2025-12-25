@@ -51,13 +51,16 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no staged changes found")
 	}
 
+	// Get repository commit guidelines
+	guidelines := gitRepo.GetCommitGuidelines()
+
 	// Generate commit message
 	provider, err := llm.NewProvider(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create AI provider: %w", err)
 	}
 
-	message, err := provider.GenerateCommitMessage(cmd.Context(), diff)
+	message, err := provider.GenerateCommitMessage(cmd.Context(), diff, guidelines)
 	if err != nil {
 		return fmt.Errorf("failed to generate commit message: %w", err)
 	}
