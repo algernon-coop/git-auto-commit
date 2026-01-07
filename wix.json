@@ -1,0 +1,18 @@
+{
+  "product": "Git Auto Commit",
+  "company": "Algernon Coop",
+  "license": "LICENSE",
+  "upgrade-code": "64d70d9a-af58-415c-ad55-87edd5c9a7ce",
+  "files": {
+    "guid": "003ddd1c-587b-4343-a9e3-023896ee0dd9",
+    "items": [
+      "dist/git-auto-commit-windows-{{.Arch}}.exe"
+    ]
+  },
+  "env": {
+    "guid": "",
+    "vars": null
+  },
+  "shortcuts": {},
+  "choco": {}
+}
